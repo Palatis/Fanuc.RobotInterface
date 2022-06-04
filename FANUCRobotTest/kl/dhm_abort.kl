@@ -1,0 +1,108 @@
+PROGRAM se_abort
+
+%ALPHABETIZE
+%COMMENT = 'SourEasy MechaOperator - Abort'
+%NOBUSYLAMP
+%NOLOCKGROUP
+%NOPAUSE = ERROR + COMMAND + TPENABLE
+%NOABORT = ERROR + COMMAND
+%UNINITVARS
+
+CONST
+	RESP_FILE    = 'TD:\RESPONSE.HTM'
+	RESP_OMODE   = 'RW'
+	
+VAR
+	fd_          : FILE
+	stat_        : INTEGER
+	success_     : BOOLEAN
+	t_           : INTEGER
+
+	-- GET params
+	prog_name    : STRING[32]  -- name of TP program (without the extension)
+	
+ROUTINE w_error_(fd : FILE; reason : STRING) FROM se_abort
+ROUTINE w_error2_(fd : FILE; reason : STRING; val : INTEGER) FROM se_abort
+ROUTINE check_getp_ : INTEGER FROM se_abort
+ROUTINE reset_getp_ FROM se_abort
+
+BEGIN
+	OPEN FILE fd_(RESP_OMODE, RESP_FILE)
+	stat_ = IO_STATUS(fd_)
+	IF (stat_ <> 0) THEN
+		-- TODO: post some error/warning using POST_ERR
+		GOTO lbl_exit0
+	ENDIF
+	
+	-- make sure all required parameters are provided
+	IF (check_getp_ <> 0) THEN
+		w_error_(fd_, 'missing parameter')
+		GOTO lbl_exit0
+	ENDIF
+
+	-- check GET params
+	IF (UNINIT(prog_name)) THEN
+		w_error_(fd_, 'conversion error')
+		GOTO lbl_exit0
+	ENDIF
+
+	-- check program name length
+	IF (STR_LEN(prog_name) > 11) THEN
+		w_error2_(fd_, 'program name too long: ', STR_LEN(prog_name))
+		GOTO lbl_exit0
+	ENDIF
+
+	success_ = TRUE
+
+	-- now try to abort the program
+	ABORT_TASK(prog_name, TRUE, TRUE, stat_)
+	IF ((stat_ <> 0) OR (NOT success_)) THEN
+		w_error2_(fd_, 'error selecting program: ', stat_)
+		GOTO lbl_exit0
+	ENDIF
+
+	-- write out response document
+	WRITE fd_('{"op" : "abort"')
+
+	-- BOOLEANs stringify to uppercase TRUE and FALSE, so we can't just
+	-- use WRITE to stringify it for us.
+	WRITE fd_(', "success" : ')
+	IF (success_) THEN
+		WRITE fd_('true')
+	ELSE
+		WRITE fd_('false')
+	ENDIF
+
+	-- end of dict (and of file)
+	WRITE fd_('}', CR)
+
+lbl_exit0::
+	CLOSE FILE fd_
+END se_abort
+
+
+ROUTINE w_error_
+BEGIN
+	WRITE fd('{"op" : "abort", "result" : "error", "reason" : "', reason , '"}', CR)
+END w_error_
+
+
+ROUTINE w_error2_
+BEGIN
+	WRITE fd('{"result" : "error", "reason" : "', reason , val, '"}', CR)
+END w_error2_
+
+
+ROUTINE check_getp_
+BEGIN
+	IF (UNINIT(prog_name)) THEN
+		RETURN (-1)
+	ENDIF
+	RETURN (0)
+END check_getp_
+
+
+ROUTINE reset_getp_
+BEGIN
+	prog_name = ''
+END reset_getp_

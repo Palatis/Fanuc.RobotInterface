@@ -1,0 +1,30 @@
+﻿<Application
+    x:Class="FANUCRobotTest.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:FANUCRobotTest.Converters"
+    xmlns:local="clr-namespace:FANUCRobotTest"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    StartupUri="UI/MainWindow.xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemeResources />
+                <ui:XamlControlsResources />
+                <!-- Other merged dictionaries here -->
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Other app resources here -->
+            <converters:BooleanToObjectConverter
+                x:Key="BooleanToVisibleHiddenConverter"
+                TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Hidden}" NullValue="{x:Static Visibility.Visible}" />
+            <converters:BooleanToObjectConverter
+                x:Key="BooleanToHiddenVisibleConverter" 
+                TrueValue="{x:Static Visibility.Hidden}" FalseValue="{x:Static Visibility.Visible}" NullValue="{x:Static Visibility.Hidden}" />
+            <converters:BooleanInvertConverter x:Key="BooleanInvertConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>
