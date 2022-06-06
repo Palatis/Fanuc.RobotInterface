@@ -55,7 +55,7 @@ namespace Fanuc.RobotInterface
             if (IsConnected)
                 return Task.CompletedTask;
 
-            var scheduler = new OrderedTaskScheduler();
+            var scheduler = new LimitedConcurrencyLevelTaskScheduler(1);
             _CancellationTokenSource = new CancellationTokenSource();
             _TaskFactory = new TaskFactory(_CancellationTokenSource.Token, TaskCreationOptions.None, TaskContinuationOptions.None, scheduler);
 
