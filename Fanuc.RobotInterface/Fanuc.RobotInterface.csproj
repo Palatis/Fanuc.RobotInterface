@@ -13,9 +13,10 @@
     <RepositoryUrl>https://github.com/Palatis/Fanuc.RobotInterface</RepositoryUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <SignAssembly>False</SignAssembly>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(Version).0</FileVersion>
+    <PackageProjectUrl>https://github.com/Palatis/FANUC.RobotInterface</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

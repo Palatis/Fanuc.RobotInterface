@@ -53,8 +53,12 @@ namespace Fanuc.RobotInterface
 
             protected override void WriteValue(string value)
             {
-                if (Offset != -1)
-                    Robot.WriteSNPX(Offset, Encoding.ASCII.GetBytes(value).Take(80).ToArray());
+                if (Offset == -1)
+                    return;
+                var bytes = Encoding.ASCII.GetBytes(value);
+                if (bytes.Length % 2 == 1)
+                    bytes = bytes.Concat(new byte[1]).ToArray();
+                Robot.WriteSNPX(Offset, bytes.Take(80).ToArray());
             }
         }
 
