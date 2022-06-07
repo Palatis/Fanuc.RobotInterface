@@ -1,16 +1,18 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Fanuc.RobotInterface
 {
     public abstract class NotifyPropertyBase : INotifyPropertyChanged, INotifyPropertyChanging
     {
-        private static readonly Dictionary<string, PropertyChangedEventArgs> _ChangedEventArgsCache = new();
-        private static readonly Dictionary<string, PropertyChangingEventArgs> _ChangingEventArgsCache = new();
+        private static readonly ObservableConcurrentDictionary<string, PropertyChangedEventArgs> _ChangedEventArgsCache = new ObservableConcurrentDictionary<string, PropertyChangedEventArgs>();
+        private static readonly ObservableConcurrentDictionary<string, PropertyChangingEventArgs> _ChangingEventArgsCache = new ObservableConcurrentDictionary<string, PropertyChangingEventArgs>();
 
         private static PropertyChangedEventArgs _GetChangedEventArgs(string name)
         {
-            var e = _ChangedEventArgsCache.GetValueOrDefault(name, null);
+            var e = _ChangedEventArgsCache.ContainsKey(name) ? _ChangedEventArgsCache[name] : null;
             if (e == null)
             {
                 e = new PropertyChangedEventArgs(name);
@@ -20,7 +22,7 @@ namespace Fanuc.RobotInterface
         }
         private static PropertyChangingEventArgs _GetChangingEventArgs(string name)
         {
-            var e = _ChangingEventArgsCache.GetValueOrDefault(name, null);
+            var e = _ChangingEventArgsCache.ContainsKey(name) ? _ChangingEventArgsCache[name] : null;
             if (e == null)
             {
                 e = new PropertyChangingEventArgs(name);

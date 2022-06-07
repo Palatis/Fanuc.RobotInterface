@@ -1,5 +1,7 @@
 ﻿using Fanuc.RobotInterface.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Fanuc.RobotInterface
 {

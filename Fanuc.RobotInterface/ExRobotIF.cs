@@ -1,6 +1,10 @@
 ﻿using Fanuc.RobotInterface.Collections;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Schedulers;
 
 namespace Fanuc.RobotInterface
@@ -11,11 +15,12 @@ namespace Fanuc.RobotInterface
 
         private TaskFactory _TaskFactory;
         private Thread _WatcherThread;
-        private CancellationTokenSource _CancellationTokenSource = new(1);
+        private CancellationTokenSource _CancellationTokenSource = new CancellationTokenSource();
 
         public ExRobotIF(IRobotIF robot)
         {
             _Robot = robot;
+            _CancellationTokenSource.Cancel();
 
             SDI = new RobotDataDictionary<int, RobotSignalHolderBase<bool>>(index => new DigitalInputHolder(this, index, IRobotIFExtension.OFFSET_SDIO));
             SDO = new RobotDataDictionary<int, RobotSignalHolderBase<bool>>(index => new DigitalOutputHolder(this, index, IRobotIFExtension.OFFSET_SDIO));
@@ -73,19 +78,26 @@ namespace Fanuc.RobotInterface
 
                     _WatcherThread = new Thread(() =>
                     {
+#if DEBUG
                         var sw1 = Stopwatch.StartNew();
                         var sw2 = new Stopwatch();
                         var i = 0;
+#endif
                         while (_Robot.IsConnected)
                         {
                             try
                             {
+#if DEBUG
                                 ++i;
                                 sw2.Start();
+#endif
+
                                 foreach (var v in AllWritableSignals)
                                     v.PushValue();
                                 foreach (var v in AllReadableSignals)
                                     v.PullValue();
+
+#if DEBUG
                                 sw2.Stop();
 
                                 if (sw1.ElapsedMilliseconds > 1000)
@@ -96,6 +108,7 @@ namespace Fanuc.RobotInterface
                                     sw1.Start();
                                     i = 0;
                                 }
+#endif
                             }
                             catch
                             {

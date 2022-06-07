@@ -1,4 +1,7 @@
-﻿namespace Fanuc.RobotInterface.SRTP
+﻿using System;
+using System.Linq;
+
+namespace Fanuc.RobotInterface.SRTP
 {
     public abstract class PacketBase
     {
@@ -58,7 +61,6 @@
         public virtual byte PacketNumber { get => Header[40]; set => Header[40] = value; }
         public virtual byte TotalPacketNumber { get => Header[41]; set => Header[41] = value; }
 
-        public TimeOnly Time => new TimeOnly(Hour, Minute, Second);
         public byte SequenceNumber { get => _SequenceNumber; set => _SequenceNumber = _SequenceNumber2 = value; }
 
         private byte[] _ExtraPayload;

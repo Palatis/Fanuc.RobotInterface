@@ -1,5 +1,9 @@
 ﻿using Fanuc.RobotInterface.SRTP;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -104,9 +108,9 @@ namespace Fanuc.RobotInterface
         public void ClearAlarm() => WriteCommand("CLRALM");
         public void ResetAlarm() => ExecuteKCL("reset");
 
-        private static readonly Regex sKclSuccessPattern = new(@"<BODY.*>.*<XMP.*>\s*(?<XMP>.*)\s*</\s*XMP>.*</\s*BODY>", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        private static readonly Regex sKclFailPatter = new(@"<BODY.*>.*ERROR:\s*([^<]*)\s*.*</\s*BODY>", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        private HttpClient _HttpClient = new();
+        private static readonly Regex sKclSuccessPattern = new Regex(@"<BODY.*>.*<XMP.*>\s*(?<XMP>.*)\s*</\s*XMP>.*</\s*BODY>", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        private static readonly Regex sKclFailPatter = new Regex(@"<BODY.*>.*ERROR:\s*([^<]*)\s*.*</\s*BODY>", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        private HttpClient _HttpClient = new HttpClient();
 
         public string ExecuteKCL(string command)
         {
@@ -256,8 +260,8 @@ namespace Fanuc.RobotInterface
                     (bools[i + 7] ? 0x80 : 0x00)
                 );
 
-            IRequestPacket req = (bytes.Length <= 6) ?
-                new ShortRequestPacket()
+            var req = (bytes.Length <= 6) ?
+                (IRequestPacket)new ShortRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -274,7 +278,7 @@ namespace Fanuc.RobotInterface
 
                     Payload = bytes,
                 } :
-                new ExtendedRequestPacket()
+                (IRequestPacket)new ExtendedRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -313,8 +317,8 @@ namespace Fanuc.RobotInterface
             --index;
             var bytes = values.SelectMany(v => new byte[] { (byte)(v & 0xff), (byte)((v >> 8) & 0xff) }).ToArray();
 
-            IRequestPacket req = (bytes.Length <= 6) ?
-                new ShortRequestPacket()
+            var req = (bytes.Length <= 6) ?
+                (IRequestPacket)new ShortRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -331,7 +335,7 @@ namespace Fanuc.RobotInterface
 
                     Payload = bytes,
                 } :
-                new ExtendedRequestPacket()
+                (IRequestPacket)new ExtendedRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -368,8 +372,8 @@ namespace Fanuc.RobotInterface
                 throw new IOException("Cannot send empty command.");
 
             var bytes = Encoding.ASCII.GetBytes(command);
-            IRequestPacket req = (bytes.Length <= 6) ?
-                new ShortRequestPacket()
+            var req = (bytes.Length <= 6) ?
+                (IRequestPacket)new ShortRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -386,7 +390,7 @@ namespace Fanuc.RobotInterface
 
                     Payload = bytes,
                 } :
-                new ExtendedRequestPacket()
+                (IRequestPacket)new ExtendedRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -420,8 +424,8 @@ namespace Fanuc.RobotInterface
                 throw new ArgumentOutOfRangeException(nameof(index), "index must be >= 1");
             --index;
 
-            IRequestPacket req = (values.Length <= 6) ?
-                new ShortRequestPacket()
+            var req = (values.Length <= 6) ?
+                (IRequestPacket)new ShortRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -438,7 +442,7 @@ namespace Fanuc.RobotInterface
 
                     Payload = values,
                 } :
-                new ExtendedRequestPacket()
+                (IRequestPacket)new ExtendedRequestPacket()
                 {
                     SequenceNumber = _SequenceNumber++,
 
@@ -526,7 +530,7 @@ namespace Fanuc.RobotInterface
             //#endif
             _Send(packet);
             var r = _Receive();
-            IResponsePacket rr = r.Length <= PacketBase.HEADER_LENGTH ? new ShortResponsePacket(r) : new ExtendedResponsePacket(r);
+            var rr = r.Length <= PacketBase.HEADER_LENGTH ? (IResponsePacket)new ShortResponsePacket(r) : (IResponsePacket)new ExtendedResponsePacket(r);
             //#if DEBUG
             //            sw.Stop();
             //            Debug.WriteLine($"{DateTime.Now:yyyy/MM/dd hh:mm:ss.fff}: Receiving {rr.Header.Length + rr.ExtraPayload.Length} took {sw.ElapsedMilliseconds}ms");

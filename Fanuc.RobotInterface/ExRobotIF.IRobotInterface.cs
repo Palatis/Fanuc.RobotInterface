@@ -13,7 +13,7 @@ namespace Fanuc.RobotInterface
         {
             if (IsConnected)
             {
-                _TaskFactory.StartNew(() => _Robot.Disconnect()).Wait();
+                _TaskFactory?.StartNew(() => _Robot.Disconnect())?.Wait();
                 _CancellationTokenSource?.Cancel();
 
                 _TaskFactory = null;

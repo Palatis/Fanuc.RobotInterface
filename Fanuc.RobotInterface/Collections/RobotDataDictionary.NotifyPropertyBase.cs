@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -6,11 +8,12 @@ namespace Fanuc.RobotInterface.Collections
 {
     internal partial class RobotDataDictionary<TKey, TValue> : INotifyPropertyChanged, INotifyCollectionChanged
     {
-        private static readonly Dictionary<string, PropertyChangedEventArgs> _ChangedEventArgsCache = new();
+        private static readonly ObservableConcurrentDictionary<string, PropertyChangedEventArgs> _ChangedEventArgsCache =
+            new ObservableConcurrentDictionary<string, PropertyChangedEventArgs>();
 
         private static PropertyChangedEventArgs _GetChangedEventArgs(string name)
         {
-            var e = _ChangedEventArgsCache.GetValueOrDefault(name, null);
+            var e = _ChangedEventArgsCache.ContainsKey(name) ? _ChangedEventArgsCache[name] : null;
             if (e == null)
             {
                 e = new PropertyChangedEventArgs(name);

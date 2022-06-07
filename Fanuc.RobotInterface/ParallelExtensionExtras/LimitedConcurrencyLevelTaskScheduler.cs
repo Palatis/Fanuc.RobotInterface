@@ -6,6 +6,9 @@
 //
 //--------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+
 namespace System.Threading.Tasks.Schedulers
 {
     /// <summary>

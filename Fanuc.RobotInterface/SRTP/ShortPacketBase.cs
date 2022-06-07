@@ -1,4 +1,6 @@
-﻿namespace Fanuc.RobotInterface.SRTP
+﻿using System;
+
+namespace Fanuc.RobotInterface.SRTP
 {
     public abstract class ShortPacketBase : PacketBase
     {

@@ -1,4 +1,6 @@
-﻿namespace Fanuc.RobotInterface.SRTP
+﻿using System.Linq;
+
+namespace Fanuc.RobotInterface.SRTP
 {
     public class ShortResponsePacket : ShortPacketBase, IResponsePacket
     {

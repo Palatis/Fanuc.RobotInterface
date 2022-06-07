@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Fanuc.RobotInterface
 {
@@ -19,9 +20,9 @@ namespace Fanuc.RobotInterface
 
     public class RobotTaskStatus : IEquatable<RobotTaskStatus>
     {
-        public string ProgramName { get; init; }
-        public short LineNumber { get; init; }
-        public RobotTaskState State { get; init; }
+        public string ProgramName { get; set; }
+        public short LineNumber { get; set; }
+        public RobotTaskState State { get; set; }
         public string Caller { get; set; }
 
         public bool Equals(RobotTaskStatus other)

@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Platforms>AnyCPU</Platforms>
@@ -13,9 +13,13 @@
     <RepositoryUrl>https://github.com/Palatis/Fanuc.RobotInterface</RepositoryUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <SignAssembly>False</SignAssembly>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(Version).0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
 
 </Project>

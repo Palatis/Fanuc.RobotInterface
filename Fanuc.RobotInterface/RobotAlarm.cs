@@ -1,4 +1,6 @@
-﻿namespace Fanuc.RobotInterface
+﻿using System;
+
+namespace Fanuc.RobotInterface
 {
     public enum AlarmCategory : short
     {
@@ -124,15 +126,15 @@
 
     public class RobotAlarm : IEquatable<RobotAlarm>
     {
-        public AlarmCategory Category { get; init; }
-        public short Number { get; init; }
+        public AlarmCategory Category { get; set; }
+        public short Number { get; set; }
 
-        public AlarmCategory CauseCategory { get; init; }
-        public short CauseNumber { get; init; }
+        public AlarmCategory CauseCategory { get; set; }
+        public short CauseNumber { get; set; }
 
-        public AlarmSeverity Severity { get; init; }
+        public AlarmSeverity Severity { get; set; }
 
-        public DateTime Time { get; init; }
+        public DateTime Time { get; set; }
 
         public static RobotAlarm FromBytes(byte[] bytes, int start = 0)
         {
@@ -162,7 +164,7 @@
         private static DateTime _GetTime(short year, short month, short day, short hour, short minute, short second)
         {
             if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0 && second == 0)
-                return DateTime.UnixEpoch;
+                return DateTime.MinValue;
             return new DateTime(year, month, day, hour, minute, second);
         }
 

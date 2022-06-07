@@ -1,4 +1,5 @@
 ﻿using Fanuc.RobotInterface.Collections;
+using System;
 
 namespace Fanuc.RobotInterface
 {
@@ -38,16 +39,22 @@ namespace Fanuc.RobotInterface
             }
 
             public override void WriteAssignment() =>
-                Offset = Robot.WriteAssignment(18, TaskType switch
-                {
-                    RobotTaskType.All => $"PRG[{Index}] 1",
-                    RobotTaskType.IgnoreMacro => $"PRG[M{Index}] 1",
-                    RobotTaskType.IgnoreKarel => $"PRG[K{Index}] 1",
-                    RobotTaskType.IgnoreMacroKarel => $"PRG[MK{Index}] 1",
-                    _ => throw new ArgumentException($"Unknown RobotTaskType {TaskType}", nameof(TaskType)),
-                });
+                Offset = Robot.WriteAssignment(18, _TaskTypeToAssignmentString(TaskType));
 
             protected override RobotTaskStatus ReadValue() => Offset == -1 ? null : RobotTaskStatus.FromBytes(Robot.ReadSNPX(Offset, 36));
+
+            private string _TaskTypeToAssignmentString(RobotTaskType t)
+            {
+                switch (t)
+                {
+                    case RobotTaskType.All: return $"PRG[{Index}] 1";
+                    case RobotTaskType.IgnoreMacro: return $"PRG[M{Index}] 1";
+                    case RobotTaskType.IgnoreKarel: return $"PRG[K{Index}] 1";
+                    case RobotTaskType.IgnoreMacroKarel: return $"PRG[MK{Index}] 1";
+                    default:
+                        throw new ArgumentException($"Unknown RobotTaskType {TaskType}", nameof(TaskType));
+                }
+            }
         }
 
         public class RobotAlarmHolder : RobotComplexDataHolderBase<RobotAlarm>

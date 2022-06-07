@@ -1,4 +1,6 @@
 ﻿using Fanuc.RobotInterface.Collections;
+using System;
+using System.Linq;
 using System.Text;
 
 namespace Fanuc.RobotInterface
@@ -34,7 +36,7 @@ namespace Fanuc.RobotInterface
                     Robot.WriteSNPX(Offset, BitConverter.GetBytes(value));
             }
 
-            protected override float ReadValue() => Offset == -1 ? default : BitConverter.ToSingle(Robot.ReadSNPX(Offset, 4));
+            protected override float ReadValue() => Offset == -1 ? default : BitConverter.ToSingle(Robot.ReadSNPX(Offset, 4), 0);
         }
 
         private class RobotPositionRegisterHolder : RobotRegisterHolderBase<Position>
@@ -65,7 +67,7 @@ namespace Fanuc.RobotInterface
 
         private class RobotStringRegisterHolder : RobotRegisterHolderBase<string>
         {
-            public override string Value { get => base.Value; set => base.Value = value.Length > 80 ? value[..80] : value; }
+            public override string Value { get => base.Value; set => base.Value = value.Length > 80 ? value.Substring(0, 80) : value; }
 
             public RobotStringRegisterHolder(IExRobotIF robot, int index) :
                 base(robot, index)
